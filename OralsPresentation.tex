@@ -1,0 +1,915 @@
+
+
+\documentclass{beamer}
+
+\mode<presentation> {
+
+
+\usetheme{Madrid}
+
+
+
+\setbeamertemplate{footline}[page number] 
+
+\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx} 
+
+
+\usepackage{comment}
+\usepackage{tikz}
+\usepackage{booktabs} 
+\usepackage{tikz-cd}
+\usepackage{fontawesome}
+\usepackage{apacite}
+\renewcommand\bibliographytypesize{\footnotesize}
+\usepackage{mathtools}
+%\usepackage {tikz}
+\usepackage{tkz-graph}
+\GraphInit[vstyle = Shade]
+\tikzset{
+  LabelStyle/.style = { rectangle, rounded corners, draw,
+                        minimum width = 2em, fill = yellow!50,
+                        text = red, font = \bfseries },
+  VertexStyle/.append style = { inner sep=5pt,
+                                font = \normalsize\bfseries},
+  EdgeStyle/.append style = {->, bend left} }
+\usetikzlibrary {positioning}
+%\usepackage {xcolor}
+\definecolor {processblue}{cmyk}{0.96,0,0,0}
+
+
+\title[Short title]{Computation and Topology} 
+
+\author{Shakil Rafi} 
+\institute[University of Arkansas] 
+{
+University of Arkansas \\ 
+\medskip
+}
+\date{\today} 
+
+\begin{document}
+\nocite{*}
+\begin{frame}
+\titlepage 
+\end{frame}
+
+\begin{frame}
+\frametitle{Table of Contents} 
+    \tableofcontents 
+\end{frame}
+
+\begin{section}{Computation}
+
+\begin{frame}{Computation: Turing Machines}
+        A $k$-tape Turing Machine $M$ is a triple $(\Gamma, Q, \delta)$ where:
+        \begin{itemize}
+            \item $\Gamma$ is a finite set of symbols that $M$'s tapes can contain including a designated start symbol \faPlay and designated blank symbol \faStop, and the numbers $0,1$. $\Gamma$ is called the \textit{alphabet} for $M$.
+            \item $Q$ is a finite set of states for $M$ including designated $Q_{start}$ and $Q_{halt}$ states.
+            \item $\delta: Q\times \Gamma^k \rightarrow Q \times \Gamma^{k-1}\times \{L,S,R\}^k$ and $(k\geq 2)$, the \textit{transition function}. 
+        \end{itemize}
+        
+        \begin{block}{Computing a function \& running time}
+        Let $f:\{0,1\}^*\rightarrow \{0,1\}^*$ and let $T:\mathbb{N}\rightarrow \mathbb{N}$. $M$ computes $f$ if whenever $M$ is configured with input $x$ it halts with output $f(x)$ written on its output tape. $M$ computes $f$ in $T(n)$ time if every input $x$ takes at most $T(|x|)$ steps. 
+    \end{block}
+\end{frame}
+
+\begin{frame}{Computation: Robustness of Turing Machines}
+        A $k$ tape Turing machine $M$ can be simulated by $\tilde{M}$ a single tape TM in polynomial time.
+        \newline
+        \newline
+        A bidirectional Turing $M$ machine can can be simulated in polynomial time by a unidirectional $\tilde{M}$.
+
+    
+    \begin{block}{Church-Turing (CT) Thesis}
+        Any physically realizable computation device can be simulated by a Turing Machine. 
+\end{block}
+    
+\end{frame}
+
+\begin{frame}{Computation: Complexity Class P}
+    Let $T:\mathbb{N}\rightarrow \mathbb{N}$ be a function. A language $L$ is in $\mathsf{DTIME}(T(n))$ iff there is a Turing Machine running in time $c\cdot T(n)$ for $c>0$ deciding $L$.
+    \begin{block}{The Class $\mathsf{P}$}
+        $\mathsf{P}=\bigcup_{k\geq 1} \mathsf{DTIME}(n^k)$.
+    \end{block}
+    This class is desirable because it is closed under composition and (nearly) independent of the computation model.
+\end{frame}
+
+\begin{frame}{Computation: Complexity Class NP}
+    \begin{block}{The Class $\mathsf{NP}$}
+    A language $L\subseteq \{0,1\}^*$ is in $\mathsf{NP}$ if $\exists p:\mathbb{N}\rightarrow \mathbb{N}$ a polynomial and a polynomial-time TM $M$ s.t. $(\forall x\in \{0,1\}^*)(x\in L\iff \exists u \in \{0,1\}^{p(|x|)}$ s.t. $M(x,u)=1)$.
+    \end{block}
+    \textbf{Example: Factoring} Given numbers $N,L,U$, does $N$ have a prime factor $p\in [L,U]$. The certificate is the factor $p$.
+    
+    \textbf{Example: Connectivity} Given a graph $G$ and given $\{s,t\}\in V(G)$, is $s$ connected to $t$ in $G$? The certificate is a path from $s$ to $t$. 
+    
+    \textbf{Example: VC} Given $G$, and $n\in \mathbb{N}$, does $G$ have a vertex cover of size $\leq n$. The certificate is a vertex cover $V$.
+    \newline
+    \newline
+    \textbf{Remark:} $\mathsf{P}\subseteq \mathsf{NP}$ as we can set $p(|x|)=0$, however it is believed that $\mathsf{P}\neq \mathsf{NP}$.
+    
+    \textbf{Remark:} $M$ is called the \textit{verifier} for $L$ and $u$ is the \textit{certificate} or \textit{witness} for $x$ w.r.t. language $L$ and machine $M$. 
+    
+\end{frame}{}
+
+\begin{frame}{Computation: Karp Reductions \& $\mathsf{NP}$-Hardness}
+    \begin{block}{Karp Reductions}
+    $L\subseteq\{0,1\}^*$ is \textit{polynomial time Karp-reducible} to to $L'\subseteq \{0,1\}^*$, denoted $L\leq_p L'$ if $\exists$ a polynomial time computable $f:\{0,1\}^*\rightarrow \{0,1\}^*$ s.t. $(\forall x \in \{0,1\}^*)(x\in L \iff f(x)\in L')$,
+    \end{block}
+    \textbf{Definition:} $L'$ is \textit{NP-hard} if $(\forall L \in \mathsf{NP})(L\leq_p L')$.
+    
+    \textbf{Definition:} $L'$ is \textit{NP-complete} if $L'$ is $\mathsf{NP}$-hard and $L'\in \mathsf{NP}$.
+    
+    \begin{block}{Transitivity of reductions}
+    \begin{itemize}
+        \item If $L\leq_p L'$ and $L' \leq_p L''$ then $L\leq_p L''$. 
+        \item If $L\in \mathsf{NP}$-hard and $L\in \mathsf{P}$ then $\mathsf{P}=\mathsf{NP}$.
+        \item If $L\in \mathsf{NP}$-complete then $L\in \mathsf{P}$ iff $\mathsf{P}=\mathsf{NP}$.
+    \end{itemize}{}
+    \end{block}
+    \textbf{Remark:} To show a problem is $\mathsf{NP}$-hard we polynomially reduce a known $\mathsf{NP}$-hard problem to it.
+\end{frame}
+
+\begin{frame}{Computation: The Cook-Levin Theorem}
+
+A CNF formula is a Boolean formula of form $\bigwedge_i \bigg(\bigvee_j v_{i_j} \bigg)$, where $v_{i_j}$ is a literal (variable $u_j$ or its negation $\neg u_j$). 
+
+A k-CNF formula is a CNF formula where each clause has exactly k variables.
+
+\begin{block}{The Problem $\mathsf{SAT}$ or $k-\mathsf{SAT}$, $k\geq 3$}
+    Given a CNF (or k-CNF instance), $k\geq 3$, is there a satisfying assignment of variables?
+\end{block}
+\textbf{Remark:} 2-SAT is in P. 
+\begin{block}{Cook-Levin Theorem (Cook '71, Levin '73)}
+    \begin{itemize}
+        \item $\mathsf{SAT}$ is $\mathsf{NP}$-complete.
+        \item $3-\mathsf{SAT}$ is $\mathsf{NP}$-complete.
+    \end{itemize}{}
+\end{block}
+\textbf{Remark:} More precisely SAT $\leq_p$ 3-SAT. 
+\end{frame}
+
+\end{section}
+
+\begin{section}{3-Manifolds} 
+
+\begin{frame}{3-Manifolds: Introduction}
+    A 3-manifold is a second countable Hausdorff space $M$ s.t. every point $x\in M$ has a neighborhood homeomorphic to an open subset of $\mathbb{R}^3$.
+    \newline
+    \newline
+    \textbf{Examples:} $\mathbb{R}^3, \mathbb{B}^3, \mathbb{S}^3,\mathbb{T}^3,V=\mathbb{S}^1\times \mathbb{D}^2, \mathbb{S}^1\times \mathbb{S}^2, \widetilde{SL(2,\mathbb{R})}$.
+    
+    
+\end{frame}
+
+\begin{frame}{3-Manifolds: Connect Sums}
+    \begin{block}{Definition: Oriented Connect Sum of (oriented) 3-Manifolds}
+        Let $M_1$ and $M_2$ be two (oriented) 3-manifolds. Let $\mathbb{B}_i\subsetneq int(M_i)$,$i=1,2$ be 3-balls embedded in $M_i$, then $M_1\#M_2 := (M_1\setminus int(\mathbb{B}_1))\bigcup_{\partial \mathbb{B}_1 \sim \partial \mathbb{B}_2} (M_2 \setminus int(\mathbb{B}_2))$. The identification is orientation reversing.  
+    \end{block}
+    \newline
+    \newline
+    Given maps $h_1,h_2:\mathbb{S}^2 \rightarrow \mathbb{S}^2$, they are both isotopic if they both preserve or both reverse orientation.
+    \newline
+    \newline
+    Given two $\mathbb{B}^3_1$ and $\mathbb{B}^3_2$ whose closure is embedded in the interior of a closed connected 3-manifold $M$, there exists an isotopy taking $B_1$ to $B_2$.  
+    \newline
+    \newline
+    Oriented 3-manifolds under oriented connect sums exhibit a monoid structure with $\mathbb{S}^3$ as the identity.
+    \newline
+    \newline
+\end{frame}
+
+\begin{frame}{3-Manifolds: Primes \& Irreducibility}
+    \begin{block}{Prime Manifolds}
+        A 3-manifold $M$ is prime if whenever $M=M_1\#M_2$, $M_1$ or $M_2$ is $\mathbb{S}^3$.
+    \end{block}{}
+    Equivalently, a 3-manifold is prime iff it contains no separating essential $\mathbb{S}^2$.
+    \begin{block}{Irreducible Manifolds}
+        A 3-manifold $M$ is \textit{irreducible} if every $\mathbb{S}^2$ in $M$ bounds $\mathbb{B}^3$.
+    \end{block}{}    
+    $\mathbb{S}^1\times \mathbb{S}^2$ is reducible.
+    \newline
+    \textbf{(Alexander Theorem)}. $\mathbb{R}^3$ is irreducible. By extension so is $\mathbb{B}^3$ and $\mathbb{S}^3$.
+    \begin{block}{Prime Manifolds that are Reducible }
+        An irreducible closed connected 3-manifold is prime. An orient-able closed connected prime 3-manifold is either irreducible or $\mathbb{S}^1\times \mathbb{S}^2$.
+    \end{block}{}
+    
+\end{frame}{}
+
+\begin{frame}{3-Manifolds: Prime Decomposition}
+    \begin{block}{Existence (Kneser '29)}
+        Every compact orient-able 3-manifold can be expressed as a connected sum of a finite number of prime factors.
+    \end{block}{}
+    \begin{block}{Uniqueness (Milnor '62)}
+        Let $M$ be a compact orient-able 3-manifold. If $M=M_1\#...\#M_j=N_1\#...\#N_k$ are prime decompositions then $j=k$ and after reordering $M_i \cong N_i$ for $i=1,...,j=k$.
+    \end{block}{}
+    
+    Up to connect summing $\mathbb{S}^3$.
+    \newline
+    \newline
+    The decomposing spheres are not unique upto diffeomoerphism of $M$.
+ 
+\end{frame}{}
+\iffalse
+\begin{frame}{3 Manifolds: Seifert Fibered Spaces 1}
+    A fibered solid torus $T(p,q)$ is constructed by taking a solid torus $\mathbb{D}^2\times I$ foliated by circles, cutting along a meridian disc and identifying the two disk components by $\frac{q}{p}$ of a full twist. 
+    \newline
+    \newline
+    We may assume that $0\leq q \leq \frac{p}{2}$, $p>0$, and that $p$ and $q$ are co-prime. 
+    \newline
+    \newline
+    The fibers of a fibered solid torus are identified with the leaves of the foliation previously i.e. $\{x\}\times I$, the leaf $\{0\}\times I$ is called the \textit{core} of the fibered torus. If $p>1$ we call the torus \textit{exceptionally} fibered. 
+    \newline
+    \newline
+    Any fiber other than the core wraps $p$ times along the $\pi_1$ generator for the solid torus and $q$ times around the core.
+    \newline
+    
+    An (orient-able) Seifert fibered space is a space $M$ that is foliated by circles s.t. each circle has a regular neighborhood homeomorphic to a fibered solid torus via a fiber preserving homeomorphism. 
+    
+\end{frame}{}
+
+\begin{frame}{3 Manifolds: Seifert Fibered Spaces 2}
+    A fibered solid torus $T(p,q)$ is p-fold covered by a trivial fibered torus.
+    \newline
+    \newline
+    The base space $B$ of a fibered solid torus is constructed by identifying each fiber to a point. For a trivial fibered torus the base space is $\mathbb{D}^2$.
+    \newline
+    \newline
+    The $p$-fold cover corresponds naturally to a $\mathbb{Z}_p$ action on $\mathbb{D}^2$. $\mathbb{D}^2$ quotient by this action is a cone orbifold with cone angle $\frac{2\pi}{p}$. 
+    
+\end{frame}
+\fi
+\iffalse
+\begin{frame}{3-manifolds: Orbifolds}
+   An orbifold is a pair $(X_O,\{U_i\})$ where $X_O$ is Hausdorff, and $X_O=\bigcup_i\{U_i\}$ is a covering spaces closed under finite intersections. Each $U_i$ is associated to a finite group $\Gamma_i$ and an action of $\Gamma_i$ on $\tilde{U_i}\subseteq \mathbb{R}^n$ and a homeomorphism $\phi_i: \tilde{U_i}/\Gamma_i \rightarrow U_i$. 
+   
+   Whenever $U_i\subset U_j$ there exists an inclusion $f_{ij}:\Gamma_i \rightarrow \Gamma_j$ and an embedding $\tilde{\phi}_{ij}: \tilde{U_i} \rightarrow \tilde{U_j}$, which is equivariant w.r.t. $f_{ij}$ (i.e. $(\forall \gamma \in \Gamma_i)(\forall x\in \tilde{U_i})(\tilde{\phi}_{ij}(\gamma x)= f_{ij}(\gamma)\tilde{\phi}_{ij}(x))$ and the following diagram commutes: 
+    
+\end{frame}
+
+\begin{frame}{3-manifolds: Orbifolds}
+    A covering of an orbifold $O$ is an orbifold $\tilde{O}$, with a projection $p: X \rightarrow X_O$ between underlying spaces, s.t. each point $x\in X_O$ has a neighborhood $U=\tilde{U}/\Gamma$, where fore each open component $C_i$ of $p^{-1}(U)$ is isomorphic to $\tilde{U}/\Gamma_i$ where $\Gamma_i\leq \Gamma$. 
+    \begin{block}{Orbifold Fundamental Group}
+        Let $(O,*)$ be an orbifold with universal cover $p:(\tilde{O},\tilde{*}) \rightarrow (O,*)$, then the fundamental group of $O$ is defined as $\pi_1^{orb}(O,*)=Aut_p(\tilde{O},\tilde{*})$.
+    \end{block}{}
+    Let $\sigma$ range over (open) cells in $O$, and $\Gamma(\sigma)$ be the local group assigned to points in $\sigma$. Then:
+    \begin{block}{Orbifold Euler Characteristic}
+        $\chi(O)=\frac{\Sigma_{\sigma \in O}(-1)^{dim(\sigma)}}{|\Gamma(\sigma)|}$.
+    \end{block}{}
+\end{frame}
+
+\begin{frame}{3-Manifolds: Orbifolds}
+    For a d-fold orbifold covering $\tilde{O}\rightarrow \tilde{O}$, $\chi(\tilde{O})=d \cdot \chi(O)$.
+    \newline
+    \newline
+    Indeed for a closed orient-able 2-orbifold $O$ with cone points of order $m_i$, $\chi(O)=\chi(X_O)-\Sigma_i (1-\frac{1}{m_i})$. 
+    
+    A \textit{good} orbifold is one that can be covered by a manifold, otherwise it is called \textit{bad}. 
+
+\end{frame}{}
+\fi
+\begin{frame}{(Canonical) Torus Decomposition}
+    Let $M$ be a compact orientable irreducible 3-manifold.
+    \newline
+    \newline
+    An embedded surface with $g \geq 1$ is \textit{incompressible} if it is $\pi_1$-injective. 
+    \newline
+    \newline
+    A surface $S\subset M$ is \textit{essential} if it is incompressible, $\partial$-incompressible, and not $\partial$-parallel.
+    \newline
+    \newline
+    An embedded torus in $M$ is \textit{canonical} if it is essential and can be isotoped off any incompressible embedded torus. 
+    \newline
+    \newline
+    A manifold $M$ is \textit{atoroidal} if it has no essential embedded torus and is itself not $\mathbb{T}^2\times [-1,1]$ or $\mathbb{K}\tilde{\times} [-1,1]$. 
+\end{frame}{}
+
+
+
+
+\begin{frame}{3-Manifolds: JSJ Decomposition \& Thurston Geometrization Conjecture}
+    \begin{block}{JSJ Decomposition Theorem (Jaco-Shalen '79, Johansson '79)}
+        A maximal (possibly empty) collection of disjoint, non-parallel, canonical tori is finite and unique upto isotopy. It cuts $M$ into submanifolds that are atoroidal (based on $\mathbb{H}^3$ or Sol) or Seifert-fibered.
+    \end{block}
+    
+    \begin{block}{The Geometrization Theorem (Thurston '82, Perelman '02)}
+        The interior of any compact, orientable 3-manifold can be split along a finite collection of essential, pari-wise disjoint, embedded 2-spheres and 2-tori into a canonical collection of geometric 3-manifolds after capping off all boundary spheres by 3-balls.
+    \end{block}
+    \textbf{Remark:} This implies the Poincar\'e conjecture: Every simply connected closed 3-manifold $M$ is diffeomorphic to $\mathbb{S}^3$. 
+
+\end{frame}
+
+\begin{frame}{3-Manifolds: The Eight Geometries}
+    A \textit{geometry} is a simply connected, homogenous, unimodular Riemannian manifold $\mathbb{X}$.
+    \newline
+    \newline
+    A manifold $M$ is \textit{geometric} if  $M$ is diffeomorphic to $\mathbb{X}/\Gamma$, where $\Gamma \leq Isom(\mathbb{X})$, is discrete and acting freely on $\mathbb{X}$. We also say $M$ has a \textit{geometric structure modeled on $\mathbb{X}$}
+    \newline
+    \newline
+    There are exactly eight maximal, three dimensional geometries: $\mathbb{E}^3,\mathbb{H}^3,\mathbb{S}^3,\mathbb{S}^2\times \mathbb{E},\mathbb{H}^2\times \mathbb{E},\widetilde{SL(2,\mathbb{R})}, Nil, Sol$.
+    \newline
+    \newline
+    Six are Seifert fibered, and classified according to $e$ (Euler number of fibration) and $\chi$ (the Euler number of the base orbifold):
+    \begin{center}
+    \begin{tabular}{l|l|l|l}
+ 
+        \quad & $\chi>0$ & $\chi=0$ & $\chi<0$ \\ 
+        \hline
+        $e=0$ & $\mathbb{S}^2\times \mathbb{E}$ & $\mathbb{E}^3$ & $\mathbb{H}^2\times \mathbb{E}$ \\ 
+        $e \neq 0$ & $\mathbb{S}^3$ & Nil & $\widetilde{SL(2,\mathbb{R})}$ \\ 
+
+    \end{tabular}
+    \end{center}
+
+
+\end{frame}{}
+
+\begin{frame}{$\pi_1(M)$ and classification}
+    Let $M$ be a closed manifold modeled on one $\mathbb{X}$ of the eight geometries, then: 
+    \begin{itemize}
+        \item If $\pi_1(M)$ is finite, then $\mathbb{X}=\mathbb{S}^3$, else
+        \item If $\pi_1(M)$ is virtually cyclic, then $\mathbb{X}=\mathbb{S}^2\times \mathbb{E}$, else
+        \item If $\pi_1(M)$ is virtually abelian, then $\mathbb{X}=\mathbb{E}^3$, else
+        \item If $\pi_1(M)$ is virtually nilpotent, then $\mathbb{X}=$Nil, else
+        \item If $\pi_1(M)$ is virtually solvable, then $\mathbb{X}=$Sol, else
+        \item If $\pi_1(M)$ has a normal cyclic group $K$, then:
+        \begin{itemize}
+            \item If a finite index subgroup of the quotient lifts, then $\mathbb{X}=\mathbb{H}^2\times \mathbb{E}$.
+            \item Otherwise $\mathbb{X}=\widetilde{SL(2,\mathbb{R})}$, else
+        \end{itemize}{}
+        \item $\mathbb{X}=\mathbb{H}^3$.
+    \end{itemize}{}
+\end{frame}{}
+
+
+
+\end{section}
+
+\begin{section}{Hardness of Sub-linking}
+    
+\begin{frame}{Preliminaries 1}
+        
+        The unknot recognition problem $\mathsf{UR}$ asks, given a knot representation (e.g. a knot diagram), is the knot the unknot?
+        \newline
+        \newline
+        UR is decidable (Haken '61).
+        \newline
+        UR $\in$ \mathsf{NP} (Haas, Lagarias, Pippenger '99).
+        \newline
+        UR $\in$ co-NP assuming GRH (Kuperberg '14).
+        \newline
+        UR $\in$ co-NP (Lackenby '16)
+        \newline
+        \newline
+        Since $\mathsf{UR}\in \mathsf{co-NP} \cap \mathsf{NP}$ this suggests that UR is not NP-hard. 
+        
+\end{frame}
+    
+\begin{frame}{Preliminaries 2}
+        We may ask a slightly related question: Given an unknot diagram $D$ and an integer $k$, can $D$ be untangled with at most $k$ Rademeister moves?
+        \newline
+        \newline
+        Given an unknot diagram with $c$ crossings we need at most $(236c)^{11}$ moves to untangle said diagram. (Lackenby '15)
+        \newline
+        \newline
+        Previously the bound was $2^{nc}$ where $n=10^{11}$. (Haas-Lagarias '01)
+        \newline
+        \newline
+        There are examples of unknot diagrams where untangling requires $O(c^2)$ Rademeister moves to untangle. (Haas-Nowik '10)
+        
+\end{frame}
+    
+\begin{frame}{Hardness of The Trivial Sub-link Problem}
+        The trivial sublink problem asks, given a link $L$ and an integer $n$, does $L$ admit an $n$-component trivial sub-link?
+        \begin{block}{Theorem (deMesmay, Rieck, Sedgewick, Tancer '18)}
+            The trivial sublink problem is $\mathsf{NP}$-complete.
+        \end{block}{}
+        \textbf{Related:} Showing that a link is a sublink of another is NP-Hard. (Lackenby '17)
+        \newline
+        \newline
+        Deciding a link is trivial is in NP. (Haas, Lagarias, Pippenger '99). Adding a collection of $n$ components of $L$ to the certificate, yields certificate for the trivial sublink problem, i.e. the trivial sublink problem is NP.
+        \newline
+        \newline
+        We need to prove that the trivial sublink problem is NP-hard, we do this via reducing 3-SAT to the trivial sublink problem.
+        
+        
+\end{frame}{}
+    
+\begin{frame}{The Trivial Sub-link Problem}
+        \textbf{Motivation:} Given a 3-SAT instance $\Phi$ on $n$ variables we create a link diagram $L_\Phi$ s.t. $L_\Phi$ admits an n-component trivial sublink iff $\Phi$ is satisfiable.
+        \begin{figure}
+            \includegraphics[scale=0.4]{links.png}
+            \caption{$D_\Phi$ for $\Phi=(x\lor y \lor \lor z)\land (x\lor \neg y \lor t)$.}.
+        \end{figure}
+\end{frame}{}   
+    
+\begin{frame}{Trivial Sub-link Problem: Proof}
+        \textbf{Setup}: For every literal $l_i$ there is a Hopf link associated to it labeled with $x_i$ and $\neg x_i$. For every clause $c_j= l_1 \lor l_2 \lor l_3$ there is a Borromean ring associated with the clause, with links labeled $l_1,l_2,l_3$. 
+        
+        The sets of Hopf links and Borromean rings are band summed according to the way the literals appear in the clause, making sure not to weave.  
+        \begin{block}{Forward implication}
+            If $\Phi$ is satisfiable then $L_\Phi$ admits an n-component trivial sublink.
+        \end{block}{}
+        Given an assignment, we remove $\kappa_{x_i}$ if $x_i=TRUE$ and remove $\kappa_{\neg x_i}$ if $x_i=FALSE$.
+        \newline
+        \newline
+        \textbf{Claim:} The resulting diagram is an $n$-component trivial sublink.
+        \newline
+        \newline
+        Exactly one component is removed from each Hopf link and by extension at-least one from each Borromean ring. The resulting rings can be isotoped back to a set of $n$ rings that are unlinked. 
+\end{frame}{}
+    
+\begin{frame}{Trivial Sub-link Problem: Proof}
+        \begin{block}{Backward Implication}
+            If $L_\Phi$ admits an n-component trivial sublink, then $\Phi$ is satisfiable.
+        \end{block}{}
+        Assume $L_\Phi$ admits an n-component trivial sublink $\mathcal{U}$. $\mathcal{U}$ does not admit the Hopf link and has n components, so exactly one of $\kappa_{x_i}$ or $\kappa_{\neg x_i}$ is in $\mathcal{U}$. 
+        \newline
+        \newline
+        If $\kappa_{x_i}$ is in $\mathcal{U}$ set $x_i=FALSE$ and if $\kappa_{\neg x_i}$ is in $\mathcal{U}$ set $x_i=TRUE$. 
+        \newline
+        \newline
+        \textbf{Claim:} This results in a satisfying assignment for $\Phi$. 
+        \newline
+        \newline
+        For contradiction assume that a clause $c_i$ is not satisfied, for some $i$. This is equivalent to saying that all variables $x_j$ in $c_i$ are assigned false for $j \in \{1,2,3\}$. This means $\kappa_{x_j}$ for $j\in \{1,2,3\}$ is present as a Borromean ring in $\mathcal{U}$ , a contradiction.   
+    
+\end{frame}{}
+
+\end{section}
+
+\iffalse
+\begin{section}{Hardness of Untangling} 
+    
+    \begin{frame}{Number of Rademeister Moves Needed for Untangling: Terminology 1}
+        An untangling of $D$ is a sequence $\mathbf{D}=(D^0,...,D^k)$  where $D^0=D$ and $D^k=U$. $D^i$ differs from $D^{i-1}$ by a single Rademeister move. 
+        \newline
+        \newline
+        The number of Rademeister moves needed in an untangling is rm(\textbf{D})
+        
+        \begin{block}{Defect of an untangling}
+            The defect of an untangling is def(\textbf{D}):=2rm(\textbf{D})-cr(D)
+        \end{block}{}
+        \newline
+        \newline
+        The defect of a diagram is the minimum over all untanglings. Indeed def(D):=2rm(D)-cr(D), where rm(D):= min rm(\textbf{D}). 
+     \end{frame}
+     
+    \begin{frame}{Number of Rademeister Moves Needed for Untangling: Terminology 2}
+        A crossing in \textbf{D} is a maximal sequence $\mathbf{r}=(r^a,r^{a+1},...r^b)$ s.t. $r^{i+1}$ is the crossing in $D^{i+1}$ corresponding to $r^i$ in $D^i$. Maximality means that $r^b$ vanishes after the (b+1)st Rademeister move.
+        \newline
+        \newline
+        An initial crossing is a crossing \textbf{r} where $a=0$. We will let $\chi(D)$ be the set of crossings in $D$. Clearly $|\chi(D)|=cr(D)$.  
+        \newline
+        \newline
+        A Rademeister $II^-$ move is economical if both crossings removed by it are initial, else it is called wasteful. We use $II^-_e$ and $II^-_w$. 
+        \newline
+        \newline
+        \[ 
+            w(\mathbf{r}) = \frac{2}{3}m_3(\textbf{r})+ \begin{cases}{}
+            0 & \text{if \textbf{r} vanishes by a } II^-_e \\
+            1 & \text{if \textbf{r} vanishes by a } I^- \\
+            2 & \text{if \textbf{r} vanishes by a } II^-_w
+            
+            \end{cases}
+        \]
+    \end{frame} 
+    
+    \begin{frame}{Relationship between defect and weight}
+        \begin{block}{Lemma}
+            If \textbf{D} is an untangling of a diagram D, then $def(\textbf{D}) \geq \Sigma_{\mathbf{r}} w(\mathbf{r})$. The sum is over all initial crossings \textbf{r} in \textbf{D}. 
+        \end{block}{}
+    Sketch of proof: Set initial charge $+2$ on each Rademeister move, $-1$ on each initial crossing, and $0$ on each non-initial crossing. 
+    
+    Rules of discharge:
+   
+         Every $I^+$ move sends $+2$ to the non-initial crossing it creates
+         
+         Every $I^-$ move sends $+2$ to the crossing it removes
+         
+         Every $II^+$ move sends $+1$ to each of the two non initial crossings it creates.
+         
+         Every $II^-_e$ move sends $+1$ to the two initial crossings it removes.
+         
+         Every $II^-_w$ removing exactly 1 initial crossings sends $+3$ to this initial crossing.
+         
+         Every $III$ move sends $\frac{2}{3}$ to every crossing it affects.
+         
+         Every non-initial crossing removed by a $II^-_w$ move sends $+1$ to this move. 
+   \end{frame}
+   
+    \begin{frame}{Relationship between defect and weight}
+       To prove the lemma we very three things after the discharge:
+       \begin{itemize}
+           \item Every move has charge at-least 0.
+           \item Every non-initial crossing has charge at-least 0.
+           \item Every initial crossing \textbf{r} has charge at-least w(\textbf{r})
+       \end{itemize}{}
+   \end{frame}{}
+
+    \begin{frame}{Untangling with $I^-$ and $II^-$ moves only}
+        \begin{block}{Lemma}
+            Let \textbf{D} be an untangling of a diagram D using $I^-$ and $II^-$ moves only. Then  def(\textbf{D}) = $\Sigma_\mathbf{r} w(\mathbf{r})$= number of $I^-$ moves. 
+        \end{block}{}
+    Sketch of proof: Let $k_1$ be the number of crossings removed by $I^-$ moves and $k_2$ be the number of crossings removed by $II^-$ moves. 
+    
+    Then by definition $\text{rm}(\mathbf{D})=k_1+\frac{k_2}{2}$. 
+    Thus $\text{def}(\mathbf{D})=2(k_1+\frac{k_2}{2})-(k_1+k_2)=k_1$. 
+    
+    \end{frame}{}
+    
+    \begin{frame}{Twins and c-close neighbors}
+        Let \textbf{r} be an initial crossing removed by a $II^-_e$ move. t(\textbf{r}) is the other crossing removed by the same $II^-_e$ move. 
+        \newline
+        \newline
+        In particular t(\textbf{r}) is also an initial crossing. Indeed for $\mathbf{r}=(r^0,...,r^b)$ we have an associated $t(\mathbf{r})=(t(r^0),...,t(r^b))$
+        \newline
+        \newline
+        Observe that $r^b$ and $t(r^b)$ form the vertices of a bigon, we will label the edges $\alpha^b(r)$ and $\beta^b(r)$. $\alpha$ is the overpass and $\beta$ the underpass. Inductively we can define $\alpha^i(r)$ and $\beta^i(r)$ for $i\in [0,b-1]$ for $\alpha^i(r)$ and $\beta^i(r)$ which will be transformed to $\alpha^{i+1}(r)$ and $\beta^{i+1}$ by the forthcoming i-th Rademeister move. 
+        \newline
+        \newline
+        We call $\alpha(r)=\alpha^0(r)$ and $\beta(r)=\beta^0(r)$ the \textit{pre-image} arcs between $r$ and $t(r)$. 
+    \end{frame}
+    
+    \begin{frame}{c-close neighbors}
+    
+        Let $R\subseteq \chi(D)$, and let $r,s \in \chi(D)$ not necessarily in $R$, and let $c\in \mathbb{Z}_+$. Then r and s are c-close neighbors wrt $R$ if r and s are connected by two arcs $\alpha$ and $\beta$ s.t.:
+        \begin{itemize}
+            \item $\alpha$ enters r and s as an overpass
+            \item $\beta$ enters r and s as an underpass
+            \item $\alpha, \beta$ can have self crossings but neither r nor s is in the interior of $\alpha$ or $\beta$.
+            \item $\alpha$ and $\beta$ contain at most $c$ crossings from $R$ in their interior. If there is a crossing in the interior of both $\alpha$ and $\beta$ this is counted only once. 
+        \end{itemize}{}
+        
+    \end{frame}
+    
+    \begin{frame}{c-close neighbors and weight}
+    
+    \begin{block}{Lemma}
+        Let $R \subseteq \chi(D)$, and let $c\in \{0,1,2,3\}$. Let $r$ be the first crossing in $R$ removed by $II^-_e$. If $w(R)\leq c$ then $r$ and $t(r)$ are c-close neighbors w.r.t. $R$.
+    \end{block}{}
+        \newline
+        Let $\alpha$ and $\beta$ be the pre-image arcs between $r$ and $t(r)$. By definition of pre-image arcs parts i and ii are satisfied. 
+        \newline
+        \newline
+        For contradiction assume either $r$ or $t(r)$ is in the interior of $\alpha(r)$ or $\beta(r)$. In particular let $\mathbf{r} = (r, r^1,...,r^b)$ lie in the interior of $\alpha(r)$. The $b+1$st Rademeister move removes $\mathbf{r}$. Any previous move preserves this crossing. This contradicts the definition that $\alpha(r^b)$ is an arc of a bigon removed by the $(b+1)$st move. 
+        \newline
+        \newline
+        Assume that there are $c+1$ crossings from $R$ in the interior. If $I^-$ moves are used $w(x)\geq c$. If at-least one $III$ move is used then $w(x) \geq (c+1)\cdot \frac{2}{3}$.
+    
+        
+    \end{frame}
+    
+    \begin{frame}{A restricted version of SAT}
+        \begin{block}{Lemma}
+            The following restricted version of SAT is still in NP:
+            \begin{itemize}
+                \item Each clause has exactly 3 literals
+                \item No clause has $x$ and $\neg x$ for the same variable $x$
+                \item Each pair of literals $\{l_1,l_2\}$ occur in at most one clause
+            \end{itemize}{}
+            \end{block}{}
+            This is proved using an auxiliary formula: $\Psi= \Psi(t,a,b,c)=(t\lor a \lor \neg b)\land (t \lor b \lor \neg c)\land (t \lor c \lor \neg a)\land (a \lor b \lor c) \land (\neg a \lor \neg b \lor \neg c)$
+            \newline
+            \newline
+            Given a formula $\Phi'$ satisfying only two of these conditions it is possible to construct $\Phi$ satisfying all three conditions in polynomial time. 
+            \newline
+            \newline
+            To do so we pass through an intermediary $\Phi''$, and show that $\Phi'$ is satisfiable iff $\Phi''$ is satisfiable.  
+    \end{frame}{}
+    
+    \begin{frame}{The Reduction: The Variable Gadget}
+        
+        \begin{figure}
+            \includegraphics[scale=0.25]{variablegadget.png}
+            \caption{The variable gadget $V(x)$}
+        \end{figure}
+        
+    \end{frame}{}
+    
+    \begin{frame}{The Reduction: The Clause Gadget}
+        \begin{figure}
+            \includegraphics[scale=0.25]{clause.png}
+            \caption{The variable gadget for $c=(l_1\lor l_2 \lor l_3)$}
+        \end{figure}
+    \end{frame}
+    
+    \begin{frame}{Blueprint for construction}
+        \begin{figure}
+            \includegraphics[scale=0.25]{blueprint.png}
+            \caption{Blueprint for $\Phi$}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Steps for building $D(\Phi)$: 1}
+        \begin{figure}
+            \includegraphics[scale=.2]{step1.png}
+            \caption{Step 1: Replace Segments $\Phi$}
+        \end{figure}
+        
+    \end{frame}{}
+    
+    \begin{frame}{Steps for building $D(\Phi)$: 2}
+        \begin{figure}
+            \includegraphics[scale=.2]{step2.png}
+            \caption{Step 2: Replace Each $K_{1,3}$ }
+        \end{figure}
+        
+    \end{frame}{}
+    
+    \begin{frame}{Steps for building $D(\Phi)$: 3}
+        \begin{figure}
+            \includegraphics[scale=.2]{step3.png}
+            \caption{Step 3: Resolve Crossings}
+        \end{figure}
+        Observe that W.O.L.O.G. the ring $l$ is above $l'$ if they both appear in the same clause $c$. We pick the other option when resolving crossings. Thus is a globally consistent choice because we assume there is at most one clause with both $l$ and $l'$.   
+    \end{frame}{}
+    
+    \begin{frame}{Steps for building $D(\Phi)$: 4}
+        \begin{figure}
+            \includegraphics[scale=.25]{step4.png}
+            \caption{Step 4: Add variable gadgets}
+        \end{figure}
+        
+    \end{frame}{}
+    
+    \begin{frame}{Steps for building $D(\Phi)$: 5}
+        \begin{figure}
+            \includegraphics[scale=.25]{step5.png}
+            \caption{Step 5: Interconnect variable gadgets}
+        \end{figure}
+        
+    \end{frame}{}
+    
+    \begin{frame}{Final Construction}
+        \begin{figure}
+            \includegraphics[scale=.25]{finalconstruction.png}
+            \caption{Final construction for $\Phi=(x_1\lor x_2 \lor x_3)\land(\negx_1\lor x_2 \lor \neg x_3)\land (\neg x_1\lor \neg x_2 \lor x_4)\land (x_1\lor \neg x_3 \lor \neg x_4)$}
+        \end{figure}
+    \end{frame}
+    
+    \begin{frame}{How this theorem proves our theorem}
+        \begin{block}{Theorem 10}
+            Let $\Phi$ be a formula in conjunctive normal form satisfying the statement of Lemma 5. Then def(D($\Phi$) $\leq n$ iff $\Phi$ is satisfiable.
+        \end{block}{}
+        
+        Theorem 1 follows from Theorem 10 and Lemma 5.
+        
+        By definition of defect the minimum number of Rademeister moves required to untangle D is $\frac{1}{2}(def(D(\Phi))+cr(D(\Phi))$
+        \newline
+        Let $k= \frac{1}{2}(n+cr(D(\Phi))$
+        By Theorem 10 $D(\Phi)$ can be untangled with at most $k$ moves iff $\Phi$ is satisfiable. By Lemma 5 this gives the required NP-Hardness.
+    \end{frame}{}
+    
+    \begin{frame}{Satisfiable implies small defect}
+        Assume that $\Phi$ is satisfiable. If $x_i$ is assigned TRUE, remove the loop at $p[x_i]$ vertex by a $I^-$ move. If $x_i$ is assigned FALSE, we remove the loop at vertex $p[\neg x_i]$ with an $I^-$ move. Once we are done, we get an untangling. 
+        \newline
+        \newline
+        The rest of the diagram can be untangled with only $II^-$ moves. 
+        \begin{figure}
+            \includegraphics[scale=.25]{tentaclereduction.png}
+            \caption{Tentacle reduction}
+        \end{figure}
+        \begin{figure}
+            \includegraphics[scale=.25]{untanglinghopflinks.png}
+            \caption{Untangling Hopf Links}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Satisfiable implies small defect}
+        \begin{figure}
+            \includegraphics[scale=.15]{untanglingcrossings.png}
+            \caption{We reduce the inner finger, then the outer finger}
+        \end{figure}
+        
+        \begin{figure}
+            \includegraphics[scale=.15]{fullshrinkagetentacles.png}
+            \caption{Full shrinkage of tentacles}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Satisfiable implies small defect}
+        \begin{figure}
+            \includegraphics[scale=.25]{simplifiedtentacles.png}
+            \caption{Simplifying the tentacles according to the satisfying assignment $x_1=x_2=x_4=TRUE$ and $x_3=FALSE$}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Satisfiable implies small defect}
+        \begin{figure}
+            \includegraphics[scale=.25]{finalsimplification.png}
+            \caption{Simplifying the previous diagram on the level of variable gadgets}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        Let $\mathbf{D}=(D^0,...,D^k)$ be an untangling of $D$ with $def(\textbf{D})\leq n$. let $R(x)\subseteq \chi (D)$ where $R(x)= \{p[x],p[\neg x], q[x], q[\neg x], s_1(x),...,s_{12}[x]\}$, i.e. 16 of the 17 crossings in $V(x)$ other than $r(x)$. Let $w(x)$ be the sum of weights of the crossings in $R(x)$. 
+        
+        \begin{block}{Lemma}
+            Let $x$ be a variable with $w(x) \leq 1$. Let $r$ be the first crossing in $R(x)$ removed by a $II^-_e$ move. The one of the following is true:
+            \begin{itemize}
+                \item $\{r,t(r)\}=\{s_1(x),s_2(x)\}$, $w(p[x])=w(x)=1$, and $p[x]$ is removed by a $I^-$ move prior.
+                \item $\{r,t(r)\}=\{s_1(x),s_3(x)\}$, $w(p[\neg x])=w(x)=1$, and $p[\neg x]$ is removed by a $I^-$ move prior.
+            \end{itemize}{}
+        \end{block}{}
+    \end{frame}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        We begin by identifying possible pairs $\{r,t(r)\}$ with Lemma 5 using $R=R(x)$ and $c=1$. We will do a case by case analysis. 
+        \begin{figure}
+            \includegraphics[scale=.3]{tableclaim1.png}
+            \caption{Possible positions for $r$ and $t(r)$ based on Claim 10.1}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        We need to rule out the case for $s_9$. For the $\alpha$ emanating from $s_9(x)$the possible $t(r)$ are $q[\neg x],s_{10}(x), r(x), \epsilon'(x),\delta'(x)$, and $\beta$ we have $q[x],s_{11}(x),r(x),\epsilon'(x),\delta'(x)$. 
+        \newline
+        \newline
+        However to reach $r(x),\delta'(x),\epsilon'(x)$ with $\alpha$ we need to pass through $s_{10}(x)$, and similarly $\beta$ has to pass through $s_{11}(x)$. This violates the fact that $\alpha$ and $\beta$ together have at most $c=1$ point of $R(x)$ in their interiors.  
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        From the table we see that the possible $r$ and $t(r)$ are:
+        \begin{itemize}
+            \item $\{r,t(r)\}=\{s_1(x),s_2(x)$, where $\alpha$ is the arc directly connecting $s_1(x)$ and $s_2(x)$ and $\beta$ connects the two crossings by passing twice through $p[x]$.
+            \item $\{r,t(r)\}=\{s_1(x),s_3(x)$, where $\beta$ is the arc directly connecting $s_1(x)$ and $s_2(x)$ and $\alpha$ connects the two crossings by passing twice through $p[x]$.
+        \end{itemize}{}
+        We focus on the first case. Before removing $s_1(x)$ and $s_2(x)$, $p[x]$ has to be removed. 
+        \newline
+        Removing $p[x]$ by a $I^-$ results in $w(p[x])\geq 1$. so along with $w(p[x])\leq w(x) \leq 1$ resulting in $w(p[x])=w(x)=1$. 
+        
+        Removing $p[x]$ with a $II^-_w$ results in $w(x)\geq 2$ a contradiction
+        
+        Applying a $III$ move swapping $s_1(x)$ with $s_2(x)$ or $p[x]$ results in $w(p[x])+w(s_1(x)+s_2(x))\geq 2\cdot \frac{2}{3}$ a contradiction. 
+        
+        A similar argument applies for Case 2. 
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        \begin{block}{Claim}
+            If $w(x)\leq 1$, then $p[-l]$ and $q[-l]$ are twins. Additionally, the pre-image arcs $\alpha$ and $\beta$ between $p[-l]$ and $q[-l]$ contain $\gamma_1[-l]$ and $\gamma_2[-l]$. 
+        \end{block}{}
+        
+        Let $R'(x):=\{p[-l],q[l],q[-l],s_9(x),...,s_{12}(x)\}$.  
+        \begin{figure}
+            \includegraphics[scale=.21]{variabler'.png}
+            \caption{We reduce the inner finger, then the outer finger}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        \begin{figure}
+            \includegraphics[scale=.3]{tableclaim2.png}
+            \caption{Possible positions for $t(r)$ depending on $r$ in Claim 10.2}
+        \end{figure}
+        
+        We do our analysis as before but with $R=R(x)$ and $c=0$. We rule out $q[x]$. There is no viable choices for $t(r)$. Note that $p[x]$ cannot be a twin for $q[x]$ as $p[x]$ is removed by a $I^-$ move by the previous claim. 
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        We may deduce therefore that def\textbf{D} $\geq \Sigma_x w(x) \geq n$. On the other hand we assumed def(\textbf{D})$\leq n$. Together this implies that $w(x)=1$ for any variable $x$. 
+        \newline
+        \newline
+        Given a variable $x$ we assign $x=TRUE$ if conclusion (i) holds and we assign $x=FALSE$ if conclusion (ii) holds. We still need to prove that this results in a satisfying assignment. 
+        \newline
+        \newline
+        For a contradiction assume there is a clause $c=(l_1\lor l_2 \lor l_3)$ that is not satisfied. That $c$ is not satisfied implies that $l_i$ is assigned false $\forall x \in \{1,2,3\}$.
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        By Claim 10.2 we see that $p[l_i]$ and $q[l_i]$ are twins for any $i\in \{1,2,3\}$, in such an instance. 
+        \newline
+        \newline
+        Let $R''(c)$ be the set of crossings in the Borromean rings union the sets $\{p[l_i],q[l_i]\}$. Observe however that all the crossings in $R''(c)$ have weight $0$ and as such have to be removed by $II^-_e$ moves. 
+        \newline
+        \newline
+        Let $r$ be the first removed crossing in $R''(c)$. This cannot be $p[l_i]$ or $q[l_i]$ from claim 10.2 as the arcs $\gamma_1[l_i]$ and $\gamma_2[l_i]$ contain some crossings in $R''(c)$. 
+        \newline
+        \newline
+        Our strategy is to show that $r$ cannot exist and as such, the existence of such a clause $c$ is a contradiction. 
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        \begin{figure}
+            \includegraphics[scale=.25]{clauseproof.png}
+            \caption{The clause gadget with crossings $u_1,...,u_8$}
+        \end{figure}
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        Let $\alpha$ and $\beta$ be the arcs between $r$ and $t(r)$ from the definition of c-close neighbors. 
+        
+        It is immediately easy to rule out $r\in \{u_4,u_5,u_6,u_7,u_8\}$ by an easy inspection as in Claim 10.2 as we immediately hit a crossing from $R''(c)$ by a possible $\alpha$ or $\beta$. 
+        \newline
+        \newline
+        We need to rule out $r\in \{u_1,u_2,u_3\}$. 
+        \newline
+        \newline
+        Consider $r=u_3$. 
+        The only viable option for $\alpha$ is to emanate left as emanating right results in $\alpha$ hits a crossing in $R''(c)$. Consequently, $\beta$ must emanate to the right as emanating left hits $u_4$, but emanating to the right guarantees that $\beta$ will hit $p[l_2]$ or $q[l_2]$. 
+        \newline
+        \newline
+        $r=u_2$ is ruled out analogously. 
+    \end{frame}{}
+    
+    \begin{frame}{Small defect implies satisfiable}
+        We need to consider $r=u_1$
+        \newline
+        \newline
+        Clearly the $\alpha$ and $\beta$ cannot lead to $u_2$ and $u_3$ as we have already ruled that out. It is sufficient to swap $r$ and $t(r)$ in the previous considerations. 
+        This means $\alpha$  has to emanate from the left of $u_1$ and $\beta$ to the right of $u_1$. 
+        \newline
+        \newline
+        The first point that that $\alpha$ emanating to the left hits in $R''(c)$ is $p[l_1]$ or $q[l_1]$, and $p[l_2]$ or $q[l_2]$ for $\beta$ emanating to the right. 
+        \newline
+        \newline
+        $t(r)$ must therefore be a crossing of $\gamma_1[l_1]$ and $\gamma_1[l_2]$. 
+        \newline
+        \newline
+        However due to our convention in our Step 3, dictates that $\alpha$ reaches this crossing as an underpass and $\beta$ reaches this crossing as an overpass. There are therefore no admissible $\alpha$ and $\beta$. This contradicts the existence of $r$. 
+        
+        
+    \end{frame}
+    
+\end{section}
+\fi
+
+\begin{section}{Some results in topology and computation}
+
+\begin{frame}{Homeomorphism Problem }
+        The Homeomorphism Problem asks given finite simplicial complexes $M$ and $N$ representing orientable smooth manifolds, do they represent homeomorphic manifolds? 
+        
+        The problem is undecidable for $d\geq 4$. (Markov '58)
+        \newline
+        \newline
+        It is decidable in dimension 2 due to classification theorems. Indeed $\chi$ and the number of boundary components and punctures is enough to define an orientable 2-manifold. 
+        \newline
+        \newline
+        The problem is decidable for dimension 3 due to the existence of Geometrization.
+        \newline
+        \newline
+        
+\end{frame}
+        
+\begin{frame}{Homeomorphism Problem}
+    
+        The oriented homeomorphism problem for closed, oriented 3-manifolds is elementary recursive. (Kuperberg '17)
+        \begin{block}{The class ELEMENTARY} 
+            ELEMENTARY = DTIME($2^n$)$\cup$DTIME($2^{2^n}$)$\cup$DTIME($2^{2^{2^n}}$)$\cup$...
+        \end{block}
+    
+        
+\end{frame}
+    
+\begin{frame}{Sphere Recognition Problem}
+        A restricted version of the problem is the Sphere Recognition Problem. Given a finite simplicial complex $N$ representing a smooth manifold, is $N$ homeomorphic to $\mathbb{S}^d$. 
+        
+        Undecidable for $d\geq 5$. (Novikov)
+        
+        Unknown for $d=4$.
+        
+        Decidable for $d=3$. (Rubinstein '94, Thompson '94)
+        
+        Sphere recognition is NP. (Ivanov '01, Schleimer '14)
+        
+        Sphere recognition is co-NP mod GRH. (Zentner '16)
+\end{frame}{}
+\iffalse
+\begin{frame}{Knot Equivalence} 
+    Given two knots $K_1$ and $K_2$ are they equivalent?
+    
+    An algorithm was given by Haken '68, Hemion '79, Matveev '07.  
+\end{frame}{}
+\fi
+\iffalse
+\begin{frame}{Rademeister moves in knot equivalence}
+        In principle given knots with $n_1$ and $n_2$ crossing numbers they are related by at least $\frac{|n_1-n_2|}{2}$ moves as a Rademeister changes crossing number by at most 2. 
+        \newline
+        \newline
+        In practice at-least quadratically many moves may be needed (Haas-Nowik '10). 
+        \newline
+        \newline
+        Given two diagrams of a link with $n$ and $n'$ crossings respectively they differ by a sequence of at most: $2^{2^{.^{.^{.^{2^{n+n'}}}}}}$ where height of tower is $c^{n+n'}$ and $c=10^{1000000}$, Rademeister moves. (Coward-Lackenby '11)
+        \newline
+        \newline
+        For each link type $\kappa$ there is a polynomial $p_\kappa$ such that any two diagrams of $\kappa$ with $c_1$ and $c_2$ crossings are related by at most $p_\kappa(c_1)+p\kappa(c_2)$ moves. (Lackenby, unpublished)
+        
+        
+        
+        
+\end{frame}{}
+\fi  
+\end{section}
+\begin{section}{Reference}
+\begin{frame}[allowframebreaks]{Reference}
+    \bibliographystyle{siam}
+    \bibliography{orals.bib}
+\end{frame}{}
+\end{section}
+
+\end{document}
+
+
